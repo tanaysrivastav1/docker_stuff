@@ -1,7 +1,7 @@
 # Start your image with a node base image
 FROM node:18-alpine
 
-# The /app directory should act as the main application directory
+# The /app directory will act as the main application directory
 WORKDIR /app
 
 # Copy the app package and package-lock.json file
@@ -12,6 +12,7 @@ COPY ./src ./src
 COPY ./public ./public
 
 # Install node packages, install serve, build the app, and remove dependencies at the end
+# add any node packages required for your app here
 RUN npm install \
     && npm install -g serve \
     && npm run build \

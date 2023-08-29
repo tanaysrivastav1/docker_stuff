@@ -1,3 +1,5 @@
+
+
 .App {
   text-align: center;
 }
@@ -8,7 +10,7 @@
 }
 
 .App-header {
-  background-color: #003f8c;
+  background-color: blue;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -16,6 +18,10 @@
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+}
+
+.App-header:hover {
+  animation: change-background-color 1s ease-in-out;
 }
 
 .App-link {
