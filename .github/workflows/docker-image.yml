@@ -1,0 +1,47 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "docker" ]
+  pull_request:
+    branches: [ "docker" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout the code
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # Step 2: Set up Docker Buildx (for building the image)
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    # Step 3: Log in to Docker Hub using secrets
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWD }}
+
+    # Step 4: Define the version number
+    - name: Set version
+      id: version
+      run: echo "VERSION=1.${{ github.run_number }}" >> $GITHUB_ENV
+
+    # Step 5: Build Docker image using the Dockerfile in your repository and tag it with the version
+    - name: Build Docker image
+      run: |
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/docker-stuff:${{ env.VERSION }} -f ./Dockerfile .
+
+    # Step 6: Push the Docker image with the version tag to Docker Hub
+    - name: Push Docker image to Docker Hub
+      run: |
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/docker-stuff:${{ env.VERSION }}
+
+    # Optional: Step 7 - clean up the docker environment after build
+    # - name: Clean up Docker
+    #   run: |
+    #     docker system prune -f
