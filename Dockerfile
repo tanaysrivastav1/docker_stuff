@@ -1,30 +1,48 @@
-# Start your image with a node base image
-FROM node:18-alpine
+# Stage 1: Build the frontend (React app)
+FROM node:18-alpine AS build-frontend
 
-# The /app directory will act as the main application directory
+# Set the working directory for frontend
 WORKDIR /app
 
-# Copy the app package and package-lock.json file
+# Copy package.json and package-lock.json for dependency management
 COPY package*.json ./
 
-# Copy local directories to the current local directory of our docker image (/app)
+# Install node modules for React frontend
+RUN npm install
+
+# Copy the frontend source code (React)
 COPY ./src ./src
 COPY ./public ./public
 
 # Accept the API key as a build argument
 ARG REACT_APP_ETHERSCAN_API_KEY
 
-# Set the API key as an environment variable
+# Set the API key as an environment variable for React
 ENV REACT_APP_ETHERSCAN_API_KEY=$REACT_APP_ETHERSCAN_API_KEY
 
-# Install node packages, install serve, build the app, and remove dependencies at the end
-# add any node packages required for your app here
-RUN npm install \
-    && npm install -g serve \
-    && npm run build \
-    && rm -fr node_modules
+# Build the React app for production
+RUN npm run build
 
-EXPOSE 3000
+# Stage 2: Set up the backend (Node.js API)
+FROM node:18-alpine
 
-# Start the app using serve command
-CMD [ "serve", "-s", "build" ]
+# Set the working directory for the backend
+WORKDIR /app
+
+# Copy the backend files
+COPY ./backend ./backend
+
+# Copy the frontend build from Stage 1 to the backend's public directory
+COPY --from=build-frontend /app/build ./backend/public
+
+# Copy package.json and package-lock.json for the backend
+COPY package*.json ./
+
+# Install backend dependencies
+RUN npm install
+
+# Expose the backend port (assuming the backend runs on port 5000)
+EXPOSE 5000
+
+# Start the backend (Node.js) server
+CMD ["node", "./backend/server.js"]
