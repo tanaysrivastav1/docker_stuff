@@ -1,53 +1,30 @@
-# Stage 1: Build the frontend (React app)
-FROM node:18-alpine AS build-frontend
+# Start your image with a node base image
+FROM node:18-alpine
 
-# Set the working directory for the frontend
+# The /app directory will act as the main application directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json for dependency management
+# Copy the app package and package-lock.json file
 COPY package*.json ./
 
-# Install node modules for the React frontend
-RUN npm install
-
-# Copy the React app source files
+# Copy local directories to the current local directory of our docker image (/app)
 COPY ./src ./src
 COPY ./public ./public
 
-# Accept the API key as a build argument for the frontend
+# Accept the API key as a build argument
 ARG REACT_APP_ETHERSCAN_API_KEY
 
-# Set the API key as an environment variable for React
+# Set the API key as an environment variable
 ENV REACT_APP_ETHERSCAN_API_KEY=$REACT_APP_ETHERSCAN_API_KEY
 
-# Build the React app for production
-RUN npm run build
+# Install node packages, install serve, build the app, and remove dependencies at the end
+# add any node packages required for your app here
+RUN npm install \
+    && npm install -g serve \
+    && npm run build \
+    && rm -fr node_modules
 
-# Stage 2: Set up the backend (Node.js API)
-FROM node:18-alpine
+EXPOSE 3000
 
-# Set the working directory for the backend
-WORKDIR /app
-
-# Copy the backend files (server.js, db.js, etc.)
-COPY ./backend ./backend
-
-# Copy the frontend build files from the previous stage
-COPY --from=build-frontend /app/build ./backend/public
-
-# Install backend dependencies
-COPY package*.json ./
-RUN npm install
-
-# Set environment variables for PostgreSQL connection in production
-ENV PG_HOST=postgresql
-ENV PG_USER=postgres_user
-ENV PG_PASSWORD=postgres_password
-ENV PG_DATABASE=wallet_db
-ENV PG_PORT=5432
-
-# Expose the port for your backend API
-EXPOSE 5000
-
-# Start the backend server
-CMD ["node", "./backend/server.js"]
+# Start the app using serve command
+CMD [ "serve", "-s", "build" ]
