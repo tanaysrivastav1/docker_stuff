@@ -1,4 +1,4 @@
-# Docker
+# Docker crypto web app using ETH API  
 
 docker build -t docker-stuff .
 
