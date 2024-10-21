@@ -1,6 +1,7 @@
 import './App.css';
 import FogMachine from './FogMachine';
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const App = () => {
   // State for user input wallet address
@@ -34,6 +35,21 @@ const App = () => {
       console.error('Error fetching ETH balance or transactions:', error);
     }
   };
+
+    // Function to store the wallet address and balance in the database
+    const storeWalletData = async () => {
+      try {
+        const response = await axios.post('/api/store-wallet', {
+          walletAddress,
+          ethBalance,
+          transactions
+        });
+        alert('Wallet data stored successfully!');
+      } catch (error) {
+        console.error('Error storing wallet data:', error);
+        alert('Failed to store wallet data.');
+      }
+    };
 
   return (
     <div className="App">
@@ -89,6 +105,10 @@ const App = () => {
             </ul>
           </div>
         )}
+
+        <button onClick={storeWalletData}>
+        Store Wallet Balance
+        </button>
 
         <div>
           <a target="_blank" href={"https://github.com/tanaysrivastav1"} class="fa fa-github-border" aria-hidden="true" rel="noopener noreferrer" style={{ marginRight: "15px" }}>
