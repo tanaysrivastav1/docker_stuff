@@ -1,20 +1,20 @@
 # Stage 1: Build the frontend (React app)
 FROM node:18-alpine AS build-frontend
 
-# Set the working directory for frontend
+# Set the working directory for the frontend
 WORKDIR /app
 
 # Copy package.json and package-lock.json for dependency management
 COPY package*.json ./
 
-# Install node modules for React frontend
+# Install node modules for the React frontend
 RUN npm install
 
-# Copy the frontend source code (React)
+# Copy the React app source files
 COPY ./src ./src
 COPY ./public ./public
 
-# Accept the API key as a build argument
+# Accept the API key as a build argument for the frontend
 ARG REACT_APP_ETHERSCAN_API_KEY
 
 # Set the API key as an environment variable for React
@@ -29,20 +29,25 @@ FROM node:18-alpine
 # Set the working directory for the backend
 WORKDIR /app
 
-# Copy the backend files
+# Copy the backend files (server.js, db.js, etc.)
 COPY ./backend ./backend
 
-# Copy the frontend build from Stage 1 to the backend's public directory
+# Copy the frontend build files from the previous stage
 COPY --from=build-frontend /app/build ./backend/public
 
-# Copy package.json and package-lock.json for the backend
-COPY package*.json ./
-
 # Install backend dependencies
+COPY package*.json ./
 RUN npm install
 
-# Expose the backend port (assuming the backend runs on port 5000)
+# Set environment variables for PostgreSQL connection in production
+ENV PG_HOST=postgresql
+ENV PG_USER=postgres_user
+ENV PG_PASSWORD=postgres_password
+ENV PG_DATABASE=wallet_db
+ENV PG_PORT=5432
+
+# Expose the port for your backend API
 EXPOSE 5000
 
-# Start the backend (Node.js) server
+# Start the backend server
 CMD ["node", "./backend/server.js"]
