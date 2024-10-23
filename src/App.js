@@ -36,21 +36,20 @@ const App = () => {
     }
   };
 
-    // Function to store the wallet address and balance in the database
-    const storeWalletData = async () => {
-      try {
-        const response = await axios.post('/api/store-wallet', {
-          walletAddress,
-          ethBalance,
-          transactions
-        });
-        alert('Wallet data stored successfully!');
-      } catch (error) {
-        console.error('Error storing wallet data:', error);
-        alert('Failed to store wallet data.');
-      }
-    };
-
+  const storeWalletData = async () => {
+    try {
+      const response = await axios.post('http://localhost:5001/api/store-wallet', {
+        walletAddress,
+        ethBalance,
+        transactions
+      });
+      alert('Wallet data stored successfully!');
+    } catch (error) {
+      console.error('Error storing wallet data:', error);
+      alert('Failed to store wallet data.');
+    }
+  };
+ 
   return (
     <div className="App">
       <header className="App-header">

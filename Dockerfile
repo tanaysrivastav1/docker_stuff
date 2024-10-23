@@ -11,12 +11,6 @@ COPY package*.json ./
 COPY ./src ./src
 COPY ./public ./public
 
-# Accept the API key as a build argument
-ARG REACT_APP_ETHERSCAN_API_KEY
-
-# Set the API key as an environment variable
-ENV REACT_APP_ETHERSCAN_API_KEY=$REACT_APP_ETHERSCAN_API_KEY
-
 # Install node packages, install serve, build the app, and remove dependencies at the end
 # add any node packages required for your app here
 RUN npm install \
