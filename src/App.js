@@ -56,7 +56,7 @@ const App = () => {
       <header className="App-header">
         <FogMachine>
           <h1 style={{ marginBottom: "10px" }}>
-            Crypto Dashboard
+            Crypto
           </h1>
         </FogMachine>
 
