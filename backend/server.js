@@ -23,6 +23,7 @@ mongoose.connect(MONGO_URI, {
 const walletSchema = new mongoose.Schema({
   walletAddress: { type: String, required: true, unique: true },
   balance:       { type: Number, required: true },
+  websiteBalance:  { type: Number, required: true },    // your site‑wallet balance
   updatedAt:     { type: Date, default: Date.now },
 });
 const Wallet = mongoose.model('Wallet', walletSchema);
@@ -30,14 +31,18 @@ const Wallet = mongoose.model('Wallet', walletSchema);
 // 4) Define your POST endpoint
 app.post('/api/store-wallet', async (req, res) => {
   try {
-    const { walletAddress, ethBalance } = req.body;
+    const { walletAddress, ethBalance, websiteWalletBalance } = req.body;
     // ethBalance may come as "1.23 ETH" — strip non‑digits:
     const balance = parseFloat(ethBalance.toString().replace(/[^\d.]/g, '')) || 0;
+
+    const siteBalance = Number(websiteWalletBalance) || 0;
 
     // Upsert so repeated calls update the same doc
     const doc = await Wallet.findOneAndUpdate(
       { walletAddress },
-      { balance, updatedAt: new Date() },
+      { balance,
+        websiteBalance: siteBalance, 
+        updatedAt: new Date() },
       { upsert: true, new: true, runValidators: true }
     );
 

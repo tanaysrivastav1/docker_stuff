@@ -44,17 +44,21 @@ const App = () => {
   // Function to store the wallet address and balance in the database
   const storeWalletData = async () => {
     try {
-      const response = await axios.post('/api/store-wallet', {
+      const response = await axios.post('http://localhost:4000/api/store-wallet', {
         walletAddress,
-        ethBalance,
-        transactions
+        ethBalance,      // e.g. "0.123 ETH"
+        websiteWalletBalance, // your site‑wallet balance (number)
       });
-      alert('Wallet data stored successfully!');
+      alert(
+        `Stored!\n` +
+        `ETH balance: ${response.data.data.balance}\n` +
+        `Site balance: ${response.data.data.websiteBalance}`
+      );
     } catch (error) {
-      console.error('Error storing wallet data:', error);
+      console.error(error);
       alert('Failed to store wallet data.');
     }
-  };
+  };  
 
   // Callback to handle when a bet is placed.
   // It subtracts the bet from the website wallet balance.
