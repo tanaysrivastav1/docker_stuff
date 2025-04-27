@@ -36,6 +36,17 @@ const App = () => {
       const transactionResponse = await fetch(`https://api.etherscan.io/api?module=account&action=txlist&address=${walletAddress}&startblock=0&endblock=99999999&sort=desc&apikey=${etherscanApiKey}`);
       const transactionData = await transactionResponse.json();
       setTransactions(transactionData.result.slice(0, 5)); // Show last 5 transactions
+
+      // take last 5 txs and add a `date` field
+      const lastFive = transactionData.result
+        .slice(0, 5)
+        .map(tx => ({
+          ...tx,
+          // timeStamp is seconds since epoch; convert to local string
+          date: new Date(Number(tx.timeStamp) * 1000).toLocaleString()
+        }));
+      setTransactions(lastFive);
+      
     } catch (error) {
       console.error('Error fetching ETH balance or transactions:', error);
     }
@@ -134,6 +145,7 @@ const App = () => {
             <ul style={{ textAlign: 'left', fontSize: "14px" }}>
               {transactions.map((tx, index) => (
                 <li key={index}>
+                  <p>Date:  {tx.date}</p>
                   <p>Hash: {tx.hash}</p>
                   <p>From: {tx.from}</p>
                   <p>To: {tx.to}</p>
