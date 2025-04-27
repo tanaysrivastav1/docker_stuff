@@ -41,6 +41,8 @@ const App = () => {
     }
   };
 
+
+
   // Function to store the wallet address and balance in the database
   const storeWalletData = async () => {
     try {

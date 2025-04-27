@@ -53,6 +53,23 @@ app.post('/api/store-wallet', async (req, res) => {
   }
 });
 
+app.get('/api/wallet/:walletAddress', async (req, res) => {
+    try {
+      // normalize to lowercase so casing mismatches don’t break the lookup
+      const address = req.params.walletAddress.toLowerCase();
+      const doc = await Wallet.findOne({ walletAddress: address });
+      if (!doc) {
+        // 404 if not found; front‑end will know to fall back to Etherscan
+        return res.status(404).json({ success: false, error: 'Not found' });
+      }
+      // send back the full document
+      res.json({ success: true, data: doc });
+    } catch (err) {
+      console.error('Lookup error:', err);
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
 // 5) Start server
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`🚀 API listening on http://localhost:${PORT}`));
